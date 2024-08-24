@@ -1,2 +1,9 @@
 venv/
-final/fasttext-wiki-news-subwords-300.model.vectors.npy
+final/fast_text_vectors.kv
+final/fast_text_vectors.kv.vectors.npy
+final/model.h5
+final/model.keras
+fast_text_vectors.kv
+fast_text_vectors.kv.vectors.npy
+model.keras
+final/model.h5

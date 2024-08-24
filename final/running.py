@@ -1,55 +1,48 @@
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.preprocessing import image
+import matplotlib as mpl
+import pandas as pd
+import gensim as gs
+import sklearn.metrics.pairwise as skpairwise
 import gensim.downloader as gdownloader
-from sklearn.metrics.pairwise import cosine_similarity
-from typing import List
-import gensim.models as models
+from matplotlib import pyplot as plt
+from typing import List, Dict
+from tensorflow.keras.models import load_model
+
+# Load the vectors from the file
+fast_text_vectors = gs.models.keyedvectors.KeyedVectors.load(
+    "fast_text_vectors.kv")
 
 # Load the model
-model = tf.keras.models.load_model(r'E:\Projects\zero-shot-learning\final\zsl_model.keras', custom_objects={'CosineSimilarity': tf.keras.metrics.CosineSimilarity()})
+model = load_model(r"E:\Projects\zero-shot-learning\final\model.keras")
 
-# Load FastText vectors
-# fast_text_vectors = gdownloader.load("fasttext-wiki-news-subwords-300")
-fast_text_vectors = models.KeyedVectors.load(r"E:\Projects\zero-shot-learning\final\fasttext-wiki-news-subwords-300.model")
-
-# Fine labels (same as in training.py)
-fine_labels = [
-    'apple', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle', 'bicycle', 'bottle', 
-    'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel', 'can', 'castle', 'caterpillar', 'cattle', 
-    'chair', 'chimpanzee', 'clock', 'cloud', 'cockroach', 'couch', 'crab', 'crocodile', 'cup', 'dinosaur', 
-    'dolphin', 'elephant', 'flatfish', 'forest', 'fox', 'girl', 'hamster', 'house', 'kangaroo', 
-    'lamp', 'leopard', 'lion', 'lizard', 'lobster', 'man', 
-    'motorcycle', 'mountain', 'mouse', 'mushroom', 'orange', 'orchid', 'otter', 
-    'pear', 'plain', 'plate', 'poppy', 'porcupine', 'possum', 
-    'rabbit', 'raccoon', 'ray', 'road', 'rocket', 'rose', 'sea', 'seal', 'shark', 'shrew', 'skunk', 
-    'skyscraper', 'snail', 'snake', 'spider', 'squirrel', 'streetcar', 'sunflower', 
-    'table', 'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout', 'tulip', 
-    'turtle', 'wardrobe', 'whale', 'wolf', 'woman', 'worm'
+images_paths: List[str] = [
+    r'E:\Projects\zero-shot-learning\demo_images\tansy.jpg',
+    r'E:\Projects\zero-shot-learning\demo_images\computer_mouse.jpg',
+    r'E:\Projects\zero-shot-learning\demo_images\petunia.jpg',
+    r'E:\Projects\zero-shot-learning\demo_images\starfish.jpg',
+    r'E:\Projects\zero-shot-learning\demo_images\chimpanzee.jpg',
+    r'E:\Projects\zero-shot-learning\demo_images\rhino.jpg'
 ]
 
-# Create vector representations for fine labels
-fine_labels_vecs = np.array([fast_text_vectors[label] for label in fine_labels])
+for img_path in images_paths:
+    img: np.ndarray = np.asarray(tf.keras.preprocessing.image.load_img(
+        img_path))
 
-# Define a function to preprocess the input image
-def preprocess_image(img_path: str) -> np.ndarray:
-    img = image.load_img(img_path, target_size=(32, 32))
-    img_array = image.img_to_array(img)
-    img_array = tf.keras.applications.vgg19.preprocess_input(img_array)
-    return np.expand_dims(img_array, axis=0)
+    # get prediction vector
+    prediction: np.ndarray = model.predict(np.expand_dims(
+        tf.keras.applications.vgg19.preprocess_input(tf.image.resize(
+            img, (32, 32))), axis=0))
 
-# Define a function to get the closest label
-def get_closest_label(vector: np.ndarray) -> str:
-    similarities = cosine_similarity([vector], fine_labels_vecs)
-    closest_idx = np.argmax(similarities)
-    return fine_labels[closest_idx]
+    # get top-n labels by cosine similarity
+    most_similar: List[str] = fast_text_vectors.similar_by_vector(
+        prediction[0], topn=5)
 
-# Load and preprocess an example image
-img_path = r'E:\Projects\zero-shot-learnin\demo_images\petunia.jpg'  # replace with your image path
-preprocessed_img = preprocess_image(img_path)
+    # display image
+    plt.figure(figsize=(2,2))
+    plt.imshow(img)
+    plt.axis('off')
+    plt.show()
 
-# Make prediction
-pred_vector = model.predict(preprocessed_img)
-predicted_label = get_closest_label(pred_vector[0])
-
-print(f"Predicted Label: {predicted_label}")
+    # print the predictions for image
+    print(f"Prediction for image: {', '.join([x[0] for x in most_similar])}")
