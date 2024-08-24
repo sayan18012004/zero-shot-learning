@@ -7,11 +7,11 @@ from typing import List
 import gensim.models as models
 
 # Load the model
-model = tf.keras.models.load_model(r'E:\Projects\Image-classification-zero-shot-learning-master\final\zsl_model.keras', custom_objects={'CosineSimilarity': tf.keras.metrics.CosineSimilarity()})
+model = tf.keras.models.load_model(r'E:\Projects\zero-shot-learning\final\zsl_model.keras', custom_objects={'CosineSimilarity': tf.keras.metrics.CosineSimilarity()})
 
 # Load FastText vectors
 # fast_text_vectors = gdownloader.load("fasttext-wiki-news-subwords-300")
-fast_text_vectors = models.KeyedVectors.load(r"E:\Projects\Image-classification-zero-shot-learning-master\final\fasttext-wiki-news-subwords-300.model")
+fast_text_vectors = models.KeyedVectors.load(r"E:\Projects\zero-shot-learning\final\fasttext-wiki-news-subwords-300.model")
 
 # Fine labels (same as in training.py)
 fine_labels = [
@@ -45,7 +45,7 @@ def get_closest_label(vector: np.ndarray) -> str:
     return fine_labels[closest_idx]
 
 # Load and preprocess an example image
-img_path = r'E:\Projects\Image-classification-zero-shot-learning-master\demo_images\petunia.jpg'  # replace with your image path
+img_path = r'E:\Projects\zero-shot-learnin\demo_images\petunia.jpg'  # replace with your image path
 preprocessed_img = preprocess_image(img_path)
 
 # Make prediction
