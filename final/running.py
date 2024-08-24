@@ -17,12 +17,7 @@ fast_text_vectors = gs.models.keyedvectors.KeyedVectors.load(
 model = load_model(r"E:\Projects\zero-shot-learning\final\model.keras")
 
 images_paths: List[str] = [
-    r'E:\Projects\zero-shot-learning\demo_images\tansy.jpg',
-    r'E:\Projects\zero-shot-learning\demo_images\computer_mouse.jpg',
-    r'E:\Projects\zero-shot-learning\demo_images\petunia.jpg',
-    r'E:\Projects\zero-shot-learning\demo_images\starfish.jpg',
-    r'E:\Projects\zero-shot-learning\demo_images\chimpanzee.jpg',
-    r'E:\Projects\zero-shot-learning\demo_images\rhino.jpg'
+    r'E:\Projects\zero-shot-learning\demo_images\tansy.jpg'
 ]
 
 for img_path in images_paths:
